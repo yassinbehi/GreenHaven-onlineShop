@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id                Int      @id @default(autoincrement())
+  name              String
+  price             Float
+  category          String
+  stock             Int
+  image             String   // public URL or API image endpoint (e.g., /api/products/:id/image)
+  imageName         String?  // original filename (optional)
+  imageContentType  String?  // MIME type (optional)
+  imageData         Bytes?   // raw image bytes stored in DB (optional)
+  description       String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Customer {
+  id          Int     @id @default(autoincrement())
+  name        String
+  email       String
+  phone       String
+  address     String
+  city        String
+  
+}
+
+model Order {
+  id            String @id   
+  customer      Json
+  items         Json      
+  subtotal      Float     
+  transportFee  Float      
+  total         Float    
+  status        String 
+  paymentMethod String 
+  date          DateTime  @default(now())
+}
