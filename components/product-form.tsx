@@ -19,8 +19,6 @@ interface ProductFormProps {
   onCancel: () => void
 }
 
-import { getCategorySlug } from "@/lib/utils"
-
 const categories = [
   { value: "indoor-plants", label: "Plantes d'Intérieur" },
   { value: "outdoor-plants", label: "Plantes d'Extérieur" },
