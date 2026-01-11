@@ -56,7 +56,11 @@ export function addToCart(product: Omit<CartItem, "quantity">): void {
     if (existingItem) {
       existingItem.quantity += 1
     } else {
-      cart.push({ ...product, quantity: 1 })
+      // Sanitize image field to avoid storing large base64 payloads in localStorage
+      const safeImage = product.image && typeof product.image === "string" && (product.image.startsWith("data:") || product.image.length > 1000)
+        ? "/placeholder.svg"
+        : product.image
+      cart.push({ ...product, image: safeImage, quantity: 1 })
     }
 
     // Try to persist; if quota exceeded, evict oldest items until it fits (best-effort)
@@ -186,9 +190,12 @@ export async function createOrder(customerInfo: Order["customer"]): Promise<Orde
   const transportFee = 8
   const total = subtotal + transportFee
 
+  // Send a minimal payload to avoid large requests (exclude images and heavy fields)
+  const itemsPayload = cart.map(({ id, name, price, quantity, category }) => ({ id, name, price, quantity, category }))
+
   const payload = {
     customer: customerInfo,
-    items: cart,
+    items: itemsPayload,
     subtotal,
     transportFee,
     total,
