@@ -19,7 +19,21 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const data = await request.json()
-  const product = await productsService.addProduct(data as any)
-  return NextResponse.json(product)
+  try {
+    const data = await request.json()
+
+    // Protect against very large base64 payloads (avoid blowing memory and failing requests)
+    const imageBase64 = (data)?.imageBase64
+    if (typeof imageBase64 === "string" && imageBase64.length > 2_000_000) {
+      return new Response(JSON.stringify({ error: "Image payload too large" }), { status: 413, headers: { "Content-Type": "application/json" } })
+    }
+
+    const product = await productsService.addProduct(data)
+    return NextResponse.json(product)
+  } catch (err) {
+    // Log the error and return a JSON 500 so the client gets a proper response instead of a network failure
+    // eslint-disable-next-line no-console
+    console.error("/api/products POST error:", err)
+    return new Response(JSON.stringify({ error: "Server error while creating product" }), { status: 500, headers: { "Content-Type": "application/json" } })
+  }
 }

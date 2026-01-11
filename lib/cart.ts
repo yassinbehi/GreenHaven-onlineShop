@@ -30,8 +30,20 @@ export interface Order {
 // Cart management functions
 export function getCart(): CartItem[] {
   if (typeof window !== "undefined") {
-    const cart = localStorage.getItem("cart")
-    return cart ? JSON.parse(cart) : []
+    try {
+      const cart = localStorage.getItem("cart")
+      return cart ? JSON.parse(cart) : []
+    } catch (err) {
+      // If parsing fails (corrupted storage) clear the cart and return empty
+      // eslint-disable-next-line no-console
+      console.warn("getCart: failed to parse localStorage cart, clearing:", err)
+      try {
+        localStorage.removeItem("cart")
+      } catch {
+        // ignore
+      }
+      return []
+    }
   }
   return []
 }
@@ -47,10 +59,47 @@ export function addToCart(product: Omit<CartItem, "quantity">): void {
       cart.push({ ...product, quantity: 1 })
     }
 
-    localStorage.setItem("cart", JSON.stringify(cart))
+    // Try to persist; if quota exceeded, evict oldest items until it fits (best-effort)
+    try {
+      localStorage.setItem("cart", JSON.stringify(cart))
+      // Dispatch custom event for cart updates
+      window.dispatchEvent(new CustomEvent("cartUpdated"))
+      return
+    } catch (err) {
+      // If it's a quota error, try to evict oldest items
+      // eslint-disable-next-line no-console
+      console.warn("addToCart: save failed, attempting eviction:", err)
 
-    // Dispatch custom event for cart updates
-    window.dispatchEvent(new CustomEvent("cartUpdated"))
+      // Best-effort: remove oldest items up to 5 times or until save succeeds
+      let evictAttempts = 0
+      while (evictAttempts < 5 && cart.length > 0) {
+        cart.shift() // remove oldest
+        try {
+          localStorage.setItem("cart", JSON.stringify(cart))
+          window.dispatchEvent(new CustomEvent("cartUpdated"))
+          // Inform the user that we had to drop items
+          alert("Le panier est trop volumineux : certains articles ont été supprimés pour libérer de l'espace.")
+          return
+        } catch {
+          evictAttempts += 1
+          // continue loop
+        }
+      }
+
+      // Final fallback: try sessionStorage
+      try {
+        sessionStorage.setItem("cart", JSON.stringify(cart))
+        window.dispatchEvent(new CustomEvent("cartUpdated"))
+        alert("Le panier a été sauvegardé en session (mémoire temporaire) car l'espace local est plein.")
+        return
+      } catch (e) {
+        // last resort: inform user and do not persist
+        // eslint-disable-next-line no-console
+        console.error("Failed to persist cart to any storage:", e)
+        alert("Impossible de sauvegarder le panier : l'espace de stockage est plein.")
+        return
+      }
+    }
   }
 }
 
@@ -146,7 +195,17 @@ export async function createOrder(customerInfo: Order["customer"]): Promise<Orde
   }
 
   const res = await fetch(`/api/orders`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
-  if (!res.ok) throw new Error("Order creation failed")
+  if (!res.ok) {
+    let msg = `Order creation failed: ${res.status}`
+    try {
+      const body = await res.json()
+      if (body?.error) msg = body.error
+    } catch {
+      // ignore parse errors
+    }
+    throw new Error(msg)
+  }
+
   const order = await res.json()
 
   // Clear cart after successful creation

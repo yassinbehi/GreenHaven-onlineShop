@@ -1,23 +1,40 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { addToCart } from "@/lib/cart"
+import { getFeaturedProducts, type Product } from "@/lib/products"
 import Link from "next/link"
+import Image from "next/image"
+ 
 
-const products = [
-  {
-    id: 1,
-    name: "Monstera Deliciosa",
-    price: 45.99,
-    image: "/plants/monstera.png",
-    description: "Parfait pour les débutants",
-    category: "Plantes d'Intérieur",
-  },
-]
+
+
 
 export function FeaturedProducts() {
-  const handleAddToCart = (product: (typeof products)[0]) => {
+  const [products, setProducts] = useState<Product[]>([])
+
+  useEffect(() => {
+    let mounted = true
+
+    async function fetchData() {
+      try {
+        const fetched = await getFeaturedProducts()
+        if (!mounted) return
+        setProducts(fetched)
+      } catch (err) {
+        console.error("Failed to load featured products", err)
+      }
+    }
+
+    fetchData()
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const handleAddToCart = (product: Product) => {
     addToCart({
       id: product.id,
       name: product.name,
@@ -42,10 +59,12 @@ export function FeaturedProducts() {
             <Card key={product.id} className="group hover:shadow-lg transition-shadow">
               <CardContent className="p-0">
                 <Link href={`/produit/${product.id}`}>
-                  <div className="aspect-square overflow-hidden rounded-t-lg cursor-pointer">
-                    <img
+                  <div className="aspect-square overflow-hidden rounded-t-lg cursor-pointer relative">
+                    <Image
                       src={product.image || "/placeholder.svg"}
                       alt={product.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 25vw"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>

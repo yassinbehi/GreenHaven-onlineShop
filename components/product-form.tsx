@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { X } from "lucide-react"
 import type { Product, ProductCreate, ProductUpdate } from "@/lib/products"
+import { getCategorySlug } from "@/lib/utils"
 
 interface ProductFormProps {
   product?: Product
@@ -18,7 +19,14 @@ interface ProductFormProps {
   onCancel: () => void
 }
 
-const categories = ["Indoor Plants", "Outdoor Plants", "Accessories", "Plant Care"]
+import { getCategorySlug } from "@/lib/utils"
+
+const categories = [
+  { value: "indoor-plants", label: "Plantes d'Intérieur" },
+  { value: "outdoor-plants", label: "Plantes d'Extérieur" },
+  { value: "accessories", label: "Accessoires" },
+  { value: "care-products", label: "Produits d'Entretien" },
+]
 
 export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
   const [formData, setFormData] = useState({
@@ -40,7 +48,7 @@ export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
       setFormData({
         name: product.name,
         price: product.price.toString(),
-        category: product.category,
+        category: getCategorySlug(product.category) || product.category || "",
         stock: product.stock.toString(),
         image: product.image,
         imagePreview: product.image || "",
@@ -72,6 +80,14 @@ export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+
+    // Limit files to ~2MB to avoid request failures with base64 payloads
+    const maxBytes = 2 * 1024 * 1024 // 2MB
+    if (file.size > maxBytes) {
+      alert("Fichier trop volumineux. Choisissez une image de moins de 2MB.")
+      return
+    }
+
     const base64 = await fileToBase64(file)
     setFormData({
       ...formData,
@@ -152,9 +168,9 @@ export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
                     <SelectValue placeholder="Choisir une catégorie" />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
+                    {categories.map((c) => (
+                      <SelectItem key={c.value} value={c.value}>
+                        {c.label}
                       </SelectItem>
                     ))}
                   </SelectContent>

@@ -8,6 +8,7 @@ import { ShoppingCart, Plus, Minus, ArrowLeft } from "lucide-react"
 import { useCart } from "@/lib/cart"
 import { useRouter } from "next/navigation"
 import type { Product } from "@/lib/products"
+import { getCategoryLabel } from "@/lib/utils"
 
 interface ProductDetailProps {
   product: Product
@@ -56,7 +57,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">{product.name}</h1>
-            <p className="text-muted-foreground capitalize">{product.category.replace("-", " ")}</p>
+            <p className="text-muted-foreground">{getCategoryLabel(product.category)}</p>
           </div>
 
           <div className="text-3xl font-bold text-primary">{product.price} TND</div>

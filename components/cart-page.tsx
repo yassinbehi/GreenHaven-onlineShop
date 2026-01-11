@@ -7,13 +7,14 @@ import { Plus, Minus, Trash2, ShoppingCart, ArrowLeft } from "lucide-react";
 import { useCart, getCartTotalWithTransport } from "@/lib/cart";
 import { CheckoutForm } from "./checkout-form";
 import Link from "next/link";
+import Image from "next/image";
 
 export function CartPage() {
   const { cart, updateCartQuantity, removeFromCart } = useCart();
   const [showCheckout, setShowCheckout] = useState(false);
-  const [city, setCity] = useState("");
+  
 
-  const { subtotal, transportFee, total } = getCartTotalWithTransport(city);
+  const { subtotal, transportFee, total } = getCartTotalWithTransport();
 
   const handleCheckoutSuccess = () => {
     setShowCheckout(false);
@@ -60,11 +61,15 @@ export function CartPage() {
               <Card key={item.id}>
                 <CardContent className="p-6">
                   <div className="flex gap-4">
-                    <img
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.name}
-                      className="w-24 h-24 object-cover rounded-lg"
-                    />
+                    <div className="w-24 h-24 relative rounded-lg overflow-hidden">
+                      <Image
+                        src={item.image || "/placeholder.svg"}
+                        alt={item.name}
+                        fill
+                        sizes="96px"
+                        className="object-cover"
+                      />
+                    </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-lg mb-1">
                         {item.name}
@@ -153,7 +158,7 @@ export function CartPage() {
                 <div className="text-sm text-muted-foreground">
                   <p>• Paiement à la livraison</p>
                   <p>• Emballage sécurisé garanti</p>
-                  <p>• Les frais de livraison standard s'appliquent</p>
+                  <p>• Les frais de livraison standard s&apos;appliquent</p>
                 </div>
               </CardContent>
             </Card>

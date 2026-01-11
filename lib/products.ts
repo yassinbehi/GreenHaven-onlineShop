@@ -39,8 +39,24 @@ export async function searchProducts(query: string): Promise<Product[]> {
 }
 
 export async function addProduct(product: ProductCreate & { imageBase64?: string; imageName?: string; imageContentType?: string }): Promise<Product> {
-	if (isServer) return server.addProduct(product as any)
+	if (isServer) return server.addProduct(product)
+
+	// Client-side guard: prevent sending very large base64 payloads
+	if (product.imageBase64 && product.imageBase64.length > 2_000_000) {
+		throw new Error("Image payload too large (limit ~2MB). Please choose a smaller image.")
+	}
+
 	const res = await fetch(`/api/products`, { method: "POST", body: JSON.stringify(product), headers: { "Content-Type": "application/json" } })
+	if (!res.ok) {
+		let msg = `Request failed: ${res.status}`
+		try {
+			const body = await res.json()
+			if (body?.error) msg = body.error
+		} catch {
+			// ignore parse errors
+		}
+		throw new Error(msg)
+	}
 	return res.json()
 }
 
@@ -55,5 +71,17 @@ export async function deleteProduct(id: number): Promise<boolean> {
 	if (isServer) return server.deleteProduct(id)
 	const res = await fetch(`/api/products/${id}`, { method: "DELETE" })
 	return res.ok
+}
+
+
+
+export async function getFeaturedProducts(): Promise<Product[]> {
+	const allProducts = await getProducts()
+	const categories = [...new Set(allProducts.map(p => p.category))]
+	
+	return categories.map(category => {
+		const categoryProducts = allProducts.filter(p => p.category === category)
+		return categoryProducts[Math.floor(Math.random() * categoryProducts.length)]
+	}).filter(Boolean)
 }
 

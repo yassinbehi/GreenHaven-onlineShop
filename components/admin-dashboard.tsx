@@ -16,7 +16,6 @@ import {
   Trash2,
   ExternalLink,
   Truck,
-  MessageSquare,
   BarChart3,
 } from "lucide-react"
 import { removeAuthToken } from "@/lib/auth"
@@ -24,37 +23,13 @@ import { getOrders, type Order } from "@/lib/cart"
 import { getProducts, addProduct, updateProduct, deleteProduct, type Product, type ProductCreate, type ProductUpdate } from "@/lib/products"
 import { ProductForm } from "./product-form"
 import Link from "next/link"
+import { getCategoryLabel } from "@/lib/utils"
 
-interface Message {
-  id: string
-  name: string
-  email: string
-  subject: string
-  message: string
-  date: string
-  status: "unread" | "read"
-}
 
-function getMessages(): Message[] {
-  if (typeof window !== "undefined") {
-    const messages = localStorage.getItem("messages")
-    return messages ? JSON.parse(messages) : []
-  }
-  return []
-}
-
-function markMessageAsRead(messageId: string) {
-  if (typeof window !== "undefined") {
-    const messages = getMessages()
-    const updatedMessages = messages.map((msg) => (msg.id === messageId ? { ...msg, status: "read" as const } : msg))
-    localStorage.setItem("messages", JSON.stringify(updatedMessages))
-  }
-}
 
 export function AdminDashboard() {
   const [orders, setOrders] = useState<Order[]>([])
   const [products, setProducts] = useState<Product[]>([])
-  const [messages, setMessages] = useState<Message[]>([])
   const [showProductForm, setShowProductForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | undefined>()
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null)
@@ -71,7 +46,6 @@ export function AdminDashboard() {
       } catch (e) {
         // keep empty
       }
-      setMessages(getMessages())
     }
     fetchData()
 
@@ -84,7 +58,6 @@ export function AdminDashboard() {
       }
       const prods = await getProducts()
       setProducts(prods)
-      setMessages(getMessages())
     }
 
     window.addEventListener("storage", handleStorageChange)
@@ -116,16 +89,23 @@ export function AdminDashboard() {
   }
 
   const handleSaveProduct = async (productData: ProductCreate | ProductUpdate) => {
-    if ("id" in productData) {
-      await updateProduct(productData.id, productData)
-    } else {
-      await addProduct(productData)
-    }
+    try {
+      if ("id" in productData) {
+        await updateProduct(productData.id, productData)
+      } else {
+        await addProduct(productData)
+      }
 
-    const prods = await getProducts()
-    setProducts(prods)
-    setShowProductForm(false)
-    setEditingProduct(undefined)
+      const prods = await getProducts()
+      setProducts(prods)
+      setShowProductForm(false)
+      setEditingProduct(undefined)
+    } catch (e) {
+      // Surface error to the user
+      // eslint-disable-next-line no-console
+      console.error("Failed to save product:", e)
+      alert((e as Error).message || "Failed to save product. See console for details.")
+    }
   }
 
   const handleDeleteProduct = async (id: number) => {
@@ -159,10 +139,6 @@ export function AdminDashboard() {
     }
   }
 
-  const handleMarkAsRead = (messageId: string) => {
-    markMessageAsRead(messageId)
-    setMessages(getMessages())
-  }
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -187,7 +163,7 @@ export function AdminDashboard() {
   const processingOrders = orders.filter((order) => order.status === "processing").length
   const completedOrders = orders.filter((order) => order.status === "completed").length
   const cancelledOrders = orders.filter((order) => order.status === "cancelled").length
-  const unreadMessages = messages.filter((msg) => msg.status === "unread").length
+  const unreadMessages = 0
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -215,7 +191,7 @@ export function AdminDashboard() {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Chiffre d'Affaires Total</CardTitle>
@@ -241,15 +217,6 @@ export function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{products.length}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Messages Non Lus</CardTitle>
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{unreadMessages}</div>
             </CardContent>
           </Card>
         </div>
@@ -287,9 +254,6 @@ export function AdminDashboard() {
           <TabsList>
             <TabsTrigger value="orders">Commandes</TabsTrigger>
             <TabsTrigger value="products">Produits</TabsTrigger>
-            <TabsTrigger value="messages">
-              Messages {unreadMessages > 0 && <Badge className="ml-2">{unreadMessages}</Badge>}
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="orders" className="space-y-6">
@@ -441,10 +405,7 @@ export function AdminDashboard() {
                         </div>
                         <h3 className="font-semibold mb-1">{product.name}</h3>
                         <p className="text-sm text-muted-foreground mb-2 capitalize">
-                          {product.category === "indoor-plants" && "Plantes d'Intérieur"}
-                          {product.category === "outdoor-plants" && "Plantes d'Extérieur"}
-                          {product.category === "accessories" && "Accessoires"}
-                          {product.category === "plant-care" && "Soins des Plantes"}
+                          {getCategoryLabel(product.category)}
                         </p>
                         <div className="flex items-center justify-between mb-3">
                           <span className="font-bold text-primary">{product.price} TND</span>
@@ -485,50 +446,6 @@ export function AdminDashboard() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="messages" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Messages Clients</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {messages.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">Aucun message pour le moment</div>
-                  ) : (
-                    messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`border rounded-lg p-4 ${message.status === "unread" ? "bg-blue-50 border-blue-200" : ""}`}
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <div>
-                            <h3 className="font-semibold">{message.subject}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              De: {message.name} ({message.email})
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <Badge variant={message.status === "unread" ? "default" : "secondary"}>
-                              {message.status === "unread" ? "Non Lu" : "Lu"}
-                            </Badge>
-                            <p className="text-sm text-muted-foreground mt-1">{message.date}</p>
-                          </div>
-                        </div>
-                        <div className="bg-muted/30 p-3 rounded mb-3">
-                          <p className="text-sm">{message.message}</p>
-                        </div>
-                        {message.status === "unread" && (
-                          <Button size="sm" onClick={() => handleMarkAsRead(message.id)}>
-                            Marquer comme Lu
-                          </Button>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
         </Tabs>
       </div>
 

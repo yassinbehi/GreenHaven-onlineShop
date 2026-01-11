@@ -74,25 +74,39 @@ export async function searchProducts(query: string): Promise<Product[]> {
 export async function addProduct(product: ProductCreate & { imageBase64?: string; imageName?: string; imageContentType?: string }): Promise<Product> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { imageBase64, imageName, imageContentType, ...rest } = product as unknown as any
-  // Create product record first
-  const created = await prisma.product.create({ data: rest })
 
-  // If image provided as base64, store bytes in DB and set image endpoint
-  if (imageBase64) {
-    const buffer = Buffer.from(imageBase64, "base64")
-    const updated = await prisma.product.update({
-      where: { id: created.id },
-      data: {
-        imageData: buffer,
-        imageName: imageName || null,
-        imageContentType: imageContentType || null,
-        image: `/api/products/${created.id}/image`,
-      },
-    })
-    return updated
+  // Ensure required DB fields are present (schema requires `image` non-null)
+  const dataToCreate = {
+    ...rest,
+    image: rest.image ?? "",
   }
 
-  return created
+  try {
+    // Create product record first
+    const created = await prisma.product.create({ data: dataToCreate })
+
+    // If image provided as base64, store bytes in DB and set image endpoint
+    if (imageBase64) {
+      const buffer = Buffer.from(imageBase64, "base64")
+      const updated = await prisma.product.update({
+        where: { id: created.id },
+        data: {
+          imageData: buffer,
+          imageName: imageName ?? null,
+          imageContentType: imageContentType ?? null,
+          image: `/api/products/${created.id}/image`,
+        },
+      })
+      return updated
+    }
+
+    return created
+  } catch (err) {
+    // Surface a clearer error message (so API can return readable JSON)
+    // eslint-disable-next-line no-console
+    console.error("addProduct error:", err)
+    throw new Error((err as Error).message || "Failed to create product")
+  }
 }
 
 export async function updateProduct(
