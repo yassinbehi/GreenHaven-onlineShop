@@ -12,6 +12,10 @@ const isServer = typeof window === "undefined"
 export async function getProducts(): Promise<Product[]> {
 	if (isServer) return server.getAllProducts()
 	const res = await fetch("/api/products")
+	if (!res.ok) {
+		console.error(`Failed to fetch products: ${res.status}`)
+		return []
+	}
 	return res.json()
 }
 
@@ -22,6 +26,10 @@ export async function getAllProducts(): Promise<Product[]> {
 export async function getProductsByCategory(category: string): Promise<Product[]> {
 	if (isServer) return server.getProductsByCategory(category)
 	const res = await fetch(`/api/products?category=${encodeURIComponent(category)}`)
+	if (!res.ok) {
+		console.error(`Failed to fetch products by category: ${res.status}`)
+		return []
+	}
 	return res.json()
 }
 
@@ -35,6 +43,10 @@ export async function getProductById(id: number): Promise<Product | null> {
 export async function searchProducts(query: string): Promise<Product[]> {
 	if (isServer) return server.searchProducts(query)
 	const res = await fetch(`/api/products?search=${encodeURIComponent(query)}`)
+	if (!res.ok) {
+		console.error(`Failed to search products: ${res.status}`)
+		return []
+	}
 	return res.json()
 }
 
