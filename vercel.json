@@ -1,0 +1,12 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "pnpm install",
+  "framework": "nextjs",
+  "nodeVersion": "20.x",
+  "env": {
+    "DATABASE_URL": {
+      "description": "PostgreSQL database connection string"
+    }
+  }
+}
