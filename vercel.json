@@ -4,10 +4,7 @@
   "installCommand": "pnpm install --frozen-lockfile",
   "framework": "nextjs",
   "env": {
-    "DATABASE_URL": {
-      "description": "PostgreSQL database connection string",
-      "required": true
-    }
+    "DATABASE_URL": "PostgreSQL database connection string"
   },
   "regions": ["iad1"],
   "github": {
