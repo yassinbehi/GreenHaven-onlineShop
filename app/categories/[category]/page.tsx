@@ -14,8 +14,9 @@ const categoriesMap: Record<string, { display: string; slug: string }> = {
   "produits-entretien": { display: "Produits d'Entretien", slug: "care-products" },
 }
 
-export default function CategoryPage({ params }: { params: { category: string } }) {
-  const mapping = categoriesMap[params.category]
+export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
+  const { category } = await params
+  const mapping = categoriesMap[category]
 
   if (!mapping) {
     notFound()

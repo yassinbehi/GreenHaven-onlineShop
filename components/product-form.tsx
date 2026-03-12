@@ -19,6 +19,12 @@ interface ProductFormProps {
   onCancel: () => void
 }
 
+interface ProductPayload extends Partial<ProductCreate> {
+  imageBase64?: string
+  imageName?: string
+  imageContentType?: string
+}
+
 const categories = [
   { value: "indoor-plants", label: "Plantes d'Intérieur" },
   { value: "outdoor-plants", label: "Plantes d'Extérieur" },
@@ -49,6 +55,9 @@ export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
         category: getCategorySlug(product.category) || product.category || "",
         stock: product.stock.toString(),
         image: product.image,
+        imageBase64: "",
+        imageName: "",
+        imageContentType: "",
         imagePreview: product.image || "",
         description: product.description || "",
       })
@@ -99,7 +108,7 @@ export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const productData: any = {
+    const productData: ProductPayload = {
       name: formData.name,
       price: Number.parseFloat(formData.price),
       category: formData.category,
@@ -118,9 +127,9 @@ export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
     }
 
     if (product) {
-      await onSave({ ...productData, id: product.id })
+      await onSave({ ...productData, id: product.id } as ProductUpdate)
     } else {
-      await onSave(productData)
+      await onSave(productData as ProductCreate & { imageBase64?: string; imageName?: string; imageContentType?: string })
     }
   }
 

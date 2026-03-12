@@ -43,7 +43,7 @@ export function AdminDashboard() {
       try {
         const ord = await getOrders()
         if (mounted) setOrders(ord)
-      } catch (e) {
+      } catch {
         // keep empty
       }
     }
@@ -53,7 +53,7 @@ export function AdminDashboard() {
       try {
         const ord = await getOrders()
         setOrders(ord)
-      } catch (e) {
+      } catch {
         // ignore
       }
       const prods = await getProducts()
@@ -91,9 +91,9 @@ export function AdminDashboard() {
   const handleSaveProduct = async (productData: ProductCreate | ProductUpdate) => {
     try {
       if ("id" in productData) {
-        await updateProduct(productData.id, productData)
+        await updateProduct(productData.id, productData as ProductUpdate)
       } else {
-        await addProduct(productData)
+        await addProduct(productData as ProductCreate & { imageBase64?: string; imageName?: string; imageContentType?: string })
       }
 
       const prods = await getProducts()
@@ -163,7 +163,6 @@ export function AdminDashboard() {
   const processingOrders = orders.filter((order) => order.status === "processing").length
   const completedOrders = orders.filter((order) => order.status === "completed").length
   const cancelledOrders = orders.filter((order) => order.status === "cancelled").length
-  const unreadMessages = 0
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -194,7 +193,7 @@ export function AdminDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Chiffre d'Affaires Total</CardTitle>
+              <CardTitle className="text-sm font-medium">Chiffre d&apos;Affaires Total</CardTitle>
               <ShoppingCart className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>

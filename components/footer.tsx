@@ -12,7 +12,7 @@ export function Footer() {
               <span className="text-2xl font-bold text-foreground">GreenHaven</span>
             </div>
             <p className="text-muted-foreground mb-4">
-              Votre partenaire de confiance pour apporter la nature chez vous. Nous proposons des plantes de qualité et des conseils d'entretien experts pour
+              Votre partenaire de confiance pour apporter la nature chez vous. Nous proposons des plantes de qualité et des conseils d&apos;entretien experts pour
               vous aider à créer votre espace vert idéal.
             </p>
             <div className="flex gap-4">
@@ -39,7 +39,7 @@ export function Footer() {
               </li>
               <li>
                 <a href="/a-propos" className="text-muted-foreground hover:text-primary transition-colors">
-                  Guide d'entretien
+                  Guide d&apos;entretien
                 </a>
               </li>
               <li>

@@ -43,7 +43,7 @@ export function Testimonials() {
                     <Star key={i} className="h-5 w-5 fill-accent text-accent" />
                   ))}
                 </div>
-                <p className="text-foreground mb-4 italic">"{testimonial.text}"</p>
+                <p className="text-foreground mb-4 italic">&quot;{testimonial.text}&quot;</p>
                 <div className="flex items-center gap-3">
                   <img
                     src={testimonial.image || "/placeholder.svg"}

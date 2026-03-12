@@ -18,7 +18,7 @@ export function HeroSection() {
       <div className="relative z-10 text-center text-white max-w-2xl px-4">
         <h1 className="text-5xl md:text-6xl font-bold mb-6">Apportez la Nature Chez Vous</h1>
         <p className="text-xl md:text-2xl mb-8 text-white/90">
-          Transformez votre espace avec notre collection soigneusement sélectionnée de belles plantes d'intérieur,
+          Transformez votre espace avec notre collection soigneusement s\u00e9lectionn\u00e9e de belles plantes d&apos;int\u00e9rieur,
           succulentes et accessoires de jardinage.
         </p>
         <Link href="/boutique">

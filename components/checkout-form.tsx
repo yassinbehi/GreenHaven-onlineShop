@@ -33,7 +33,7 @@ export function CheckoutForm({ cart, onBack, onSuccess }: CheckoutFormProps) {
   const [totals, setTotals] = useState({ subtotal: 0, transportFee: 0, total: 0 })
 
   useEffect(() => {
-    const newTotals = getCartTotalWithTransport(formData.city)
+    const newTotals = getCartTotalWithTransport()
     setTotals(newTotals)
   }, [formData.city])
 

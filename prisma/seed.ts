@@ -154,7 +154,7 @@ async function main() {
       const createdProduct = await prisma.product.upsert({
         where: { id: product.id },
         update: {},
-        create: product,
+        create: { ...product, updatedAt: new Date() },
       })
       console.log(`✅ Seeded product: ${createdProduct.name}`)
     } catch (error) {

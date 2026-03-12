@@ -15,10 +15,10 @@ export default function AboutPage() {
                 Bienvenue chez GreenHaven, votre destination de confiance pour amener la nature chez vous. Fondés par une passion pour les plantes et un mode de vie durable, nous aidons les passionnés à créer des espaces verts harmonieux.
               </p>
               <p className="text-lg text-muted-foreground mb-6">
-                Notre collection sélectionnée avec soin comprend des plantes faciles d'entretien pour débutants ainsi que des variétés exotiques pour les jardiniers expérimentés. Nous pensons que chacun mérite de profiter des bienfaits des plantes chez soi.
+                Notre collection sélectionnée avec soin comprend des plantes faciles d&apos;entretien pour débutants ainsi que des variétés exotiques pour les jardiniers expérimentés. Nous pensons que chacun mérite de profiter des bienfaits des plantes chez soi.
               </p>
               <p className="text-lg text-muted-foreground">
-                Chez GreenHaven, nous nous engageons à fournir non seulement de belles plantes, mais aussi les conseils et accessoires nécessaires pour les aider à prospérer. Notre équipe d'experts est là pour vous accompagner à chaque étape.
+                Chez GreenHaven, nous nous engageons à fournir non seulement de belles plantes, mais aussi les conseils et accessoires nécessaires pour les aider à prospérer. Notre équipe d&apos;experts est là pour vous accompagner à chaque étape.
               </p>
             </div>
           </div>

@@ -45,16 +45,16 @@ export function Header() {
               <div className="absolute top-full left-0 mt-2 w-48 bg-background border border-border rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                 <div className="py-2">
                   <Link href="/categories/plantes-interieur" className="block px-4 py-2 text-sm hover:bg-muted">
-                    Plantes d'Intérieur
+                    Plantes d&apos;Intérieur
                   </Link>
                   <Link href="/categories/plantes-exterieur" className="block px-4 py-2 text-sm hover:bg-muted">
-                    Plantes d'Extérieur
+                    Plantes d&apos;Extérieur
                   </Link>
                   <Link href="/categories/accessoires" className="block px-4 py-2 text-sm hover:bg-muted">
                     Accessoires
                   </Link>
                   <Link href="/categories/produits-entretien" className="block px-4 py-2 text-sm hover:bg-muted">
-                    Produits d'Entretien
+                    Produits d&apos;Entretien
                   </Link>
                 </div>
               </div>
@@ -111,14 +111,14 @@ export function Header() {
                     onClick={() => setIsMenuOpen(false)}
                     className="block text-foreground hover:text-primary transition-colors"
                   >
-                    Plantes d'Intérieur
+                    Plantes d&apos;Intérieur
                   </Link>
                   <Link
                     href="/categories/plantes-exterieur"
                     onClick={() => setIsMenuOpen(false)}
                     className="block text-foreground hover:text-primary transition-colors"
                   >
-                    Plantes d'Extérieur
+                    Plantes d&apos;Extérieur
                   </Link>
                   <Link
                     href="/categories/accessoires"
@@ -132,7 +132,7 @@ export function Header() {
                     onClick={() => setIsMenuOpen(false)}
                     className="block text-foreground hover:text-primary transition-colors"
                   >
-                    Produits d'Entretien
+                    Produits d&apos;Entretien
                   </Link>
                 </div>
               </div>

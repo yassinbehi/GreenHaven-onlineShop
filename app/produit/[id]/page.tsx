@@ -4,8 +4,9 @@ import { ProductDetail } from "@/components/product-detail"
 import { getProductById } from "@/lib/products"
 import { notFound } from "next/navigation"
 
-export default async function ProductPage({ params }: { params: { id: string } }) {
-  const productId = Number.parseInt(params.id)
+export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const productId = Number.parseInt(id)
   const product = await getProductById(productId)
 
   if (!product) {
