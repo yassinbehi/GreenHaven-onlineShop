@@ -1,12 +1,19 @@
 {
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "installCommand": "pnpm install",
+  "buildCommand": "prisma generate && next build",
+  "devCommand": "next dev",
+  "installCommand": "pnpm install --frozen-lockfile",
   "framework": "nextjs",
   "nodeVersion": "20.x",
   "env": {
     "DATABASE_URL": {
-      "description": "PostgreSQL database connection string"
+      "description": "PostgreSQL database connection string",
+      "required": true
     }
+  },
+  "regions": ["iad1"],
+  "github": {
+    "enabled": true,
+    "autoAlias": true,
+    "silent": false
   }
 }
