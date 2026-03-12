@@ -3,7 +3,6 @@
   "devCommand": "next dev",
   "installCommand": "pnpm install --frozen-lockfile",
   "framework": "nextjs",
-  "nodeVersion": "20.x",
   "env": {
     "DATABASE_URL": {
       "description": "PostgreSQL database connection string",
