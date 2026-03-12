@@ -1,6 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '.prisma/client/index-browser': require.resolve('@prisma/client'),
+      };
+    }
+    return config;
+  },
   async redirects() {
     return [
       { source: "/shop", destination: "/boutique", permanent: true },
